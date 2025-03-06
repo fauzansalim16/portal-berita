@@ -63,21 +63,31 @@ class PostController extends Controller
         ], 201);
     }
 
+    // app/Http/Controllers/Api/PostController.php
+
     public function show($id)
     {
         $post = $this->postRepository->find($id);
 
-        // Tambahkan URLs media
-        $post->featured_image = $post->getFirstMediaUrl('featured_image');
-        $post->gallery = $post->getMedia('gallery')->map(function ($media) {
-            return $media->getUrl();
+        // Menambahkan URL media ke response
+        $response = $post->toArray();
+        $response['featured_image'] = $post->getFirstMediaUrl('featured_image');
+        $response['gallery'] = $post->getMedia('gallery')->map(function ($media) {
+            return [
+                'id' => $media->id,
+                'url' => $media->getUrl(),
+                'name' => $media->name,
+                'file_name' => $media->file_name
+            ];
         });
 
         return response()->json([
             'status' => 'success',
-            'data' => $post
+            'data' => $response
         ]);
     }
+
+    // Tambahkan juga di method index dan lainnya yang menampilkan post
 
     public function update(PostRequest $request, $id)
     {
@@ -100,33 +110,69 @@ class PostController extends Controller
         ]);
     }
 
+    // app/Http/Controllers/Api/PostController.php
+
+    // Metode untuk upload Featured Image
     public function uploadFeaturedImage(PostImageRequest $request, $id)
     {
-        $media = $this->postRepository->uploadFeaturedImage($id, $request->file('image'));
+        $post = $this->postRepository->find($id);
+
+        // Hapus gambar lama jika ada
+        if ($post->hasMedia('featured_image')) {
+            $post->clearMediaCollection('featured_image');
+        }
+
+        // Upload gambar baru
+        $media = $post->addMedia($request->file('image'))
+            ->toMediaCollection('featured_image');
 
         return response()->json([
             'status' => 'success',
             'message' => 'Featured image uploaded successfully',
             'data' => [
-                'url' => $media->getUrl()
+                'id' => $media->id,
+                'url' => $media->getUrl(),
+                'name' => $media->name,
+                'file_name' => $media->file_name
             ]
         ]);
     }
 
+    // Metode untuk upload Gallery Images
     public function uploadGalleryImages(PostImageRequest $request, $id)
     {
-        $mediaItems = $this->postRepository->uploadGalleryImages($id, $request->file('images'));
+        $post = $this->postRepository->find($id);
+        $mediaItems = [];
 
-        $urls = collect($mediaItems)->map(function ($media) {
-            return $media->getUrl();
-        });
+        foreach ($request->file('images') as $image) {
+            $media = $post->addMedia($image)
+                ->toMediaCollection('gallery');
+
+            $mediaItems[] = [
+                'id' => $media->id,
+                'url' => $media->getUrl(),
+                'name' => $media->name,
+                'file_name' => $media->file_name
+            ];
+        }
 
         return response()->json([
             'status' => 'success',
             'message' => 'Gallery images uploaded successfully',
-            'data' => [
-                'urls' => $urls
-            ]
+            'data' => $mediaItems
+        ]);
+    }
+
+    // Metode untuk menghapus media
+    public function deleteMedia($id, $mediaId)
+    {
+        $post = $this->postRepository->find($id);
+        $media = $post->media()->findOrFail($mediaId);
+        $media->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Media deleted successfully'
         ]);
     }
 }
