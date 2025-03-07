@@ -10,7 +10,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Protected routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    // Protected routes for verified users
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
 });
@@ -39,3 +40,15 @@ Route::get('public/categories/{category}', [CategoryController::class, 'show']);
 Route::get('public/posts/published', [PostController::class, 'published']);
 Route::get('public/posts/category/{categoryId}', [PostController::class, 'byCategory']);
 Route::get('public/posts/{post}', [PostController::class, 'show']);
+
+// routes/api.php
+
+// Email Verification Routes
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->middleware(['signed'])
+    ->name('verification.verify');
+
+Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
+    ->middleware(['throttle:6,1'])
+    ->name('verification.send');
+
