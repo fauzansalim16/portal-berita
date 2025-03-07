@@ -7,9 +7,67 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About This Project
+# About This Project
 
-News portal project
+Project portal berita menggunakan auth berbasis sanctum, Email Notification dan Verification, Cache, Event Listene, Queue
+
+---
+
+# Cara Instalasi Proyek Laravel
+
+1. **Clone Repository**  
+   Clone repository proyek Laravel Anda ke direktori lokal:
+
+    ```bash
+    git clone https://github.com/username/nama-repo.git
+    cd nama-repo
+    ```
+
+2. **Install Dependencies**  
+   Jalankan perintah berikut untuk menginstal semua dependensi yang diperlukan:
+
+    ```bash
+    composer install
+    ```
+
+3. **Buat File `.env`**  
+   Salin file `.env.example` dan ubah namanya menjadi `.env`:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+4. **Generate Application Key**  
+   Generate application key untuk proyek Laravel Anda:
+
+    ```bash
+    php artisan key:generate
+    ```
+
+5. **Konfigurasi Database dan Mail**  
+   Buka file `.env` dan sesuaikan konfigurasi database dan mail dengan pengaturan lokal Anda.
+
+6. **Jalankan Migrasi dan Seeder**  
+   Jalankan migrasi untuk membuat tabel di database:
+
+    ```bash
+    php artisan migrate
+    ```
+
+7. **Jalankan Server Laravel**  
+   Jalankan server Laravel dengan perintah:
+
+    ```bash
+    php artisan serve
+    ```
+
+8. **Jalankan Queue Worker**  
+   Jalankan queue worker dengan perintah berikut:
+    ```bash
+    php artisan queue:work
+    ```
+
+---
 
 # API Documentation
 
