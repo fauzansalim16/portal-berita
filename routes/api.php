@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\BookmarkController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -41,8 +42,6 @@ Route::get('public/posts/published', [PostController::class, 'published']);
 Route::get('public/posts/category/{categoryId}', [PostController::class, 'byCategory']);
 Route::get('public/posts/{post}', [PostController::class, 'show']);
 
-// routes/api.php
-
 // Email Verification Routes
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware(['signed'])
@@ -52,3 +51,8 @@ Route::post('/email/verification-notification', [AuthController::class, 'resendV
     ->middleware(['throttle:6,1'])
     ->name('verification.send');
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/bookmarks', [BookmarkController::class, 'index']);
+    Route::post('/posts/{post}/bookmark', [BookmarkController::class, 'toggle']);
+    Route::get('/posts/{post}/bookmark', [BookmarkController::class, 'check']);
+});
